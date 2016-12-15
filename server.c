@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "pipe_networking.h"
 
 void process( char * s );
@@ -21,11 +16,7 @@ int main() {
   return 0;
 }
 
-
-
-
 void process( char * s ) {
-
   while ( *s ) {
     *s = (*s - 'a' + 13) % 26 + 'a';
     s++;
