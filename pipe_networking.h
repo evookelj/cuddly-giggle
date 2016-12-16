@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 
+char * WKP_NAME = "luigi";
 int client_handshake( int * to_server);
 int server_handshake( int * from_client);
 
