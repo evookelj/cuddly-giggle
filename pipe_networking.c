@@ -31,29 +31,30 @@ int client_handshake( int * to_server) {
 	//3. create a client FIFO, not well known
 	char * LKP_NAME = "waluigi";
 	int made_lkp = mkfifo(LKP_NAME, 0644);
+	if (made_lkp < 0) printf("ERROR on made_lkp: %s\n", strerror(made_lkp));
 
 	//4a. client connects to well known pipe
 	int opened_wkp = open(WKP_NAME, O_WRONLY);
 	printf("[CLIENT] opening WKP\n");
-	if (opened_wkp < 0) printf("ERROR: %s\n", strerror(opened_wkp));
-
+	if (opened_wkp < 0) printf("ERROR on opened_wkp: %s\n", strerror(opened_wkp));
+	
 	//4b. send the LKP_NAME to the server
 	printf("[CLIENT] sending LKP_NAME\n");
-	int sent_lkp = write(opened_wkp, LKP_NAME, sizeof(LKP_NAME));
-	if (sent_lkp < 0) printf("ERROR: %s\n", strerror(sent_lkp));
+	int sent_lkp = write(opened_wkp, LKP_NAME, strlen(LKP_NAME)+1);
+	if (sent_lkp < 0) printf("ERROR on sent_lkp: %s\n", strerror(sent_lkp));
 
 	//5. client waits for message from server
 	printf("[CLIENT] awaiting server message\n");
 	int opened_lkp = open(LKP_NAME, O_RDONLY);
-	if (opened_lkp < 0) printf("ERROR: %s\n", strerror(opened_lkp));
+	if (opened_lkp < 0) printf("ERROR on opened_lkp: %s\n", strerror(opened_lkp));
 
 	//8. client gets server msg on lkp, removes lkp
 	char msg[MESSAGE_BUFFER_SIZE];
 	int read_lkp = read(opened_lkp, msg, MESSAGE_BUFFER_SIZE);
-	if (read_lkp < 0) printf("ERROR: %s\n", strerror(read_lkp));
+	if (read_lkp < 0) printf("ERROR on read_lkp: %s\n", strerror(read_lkp));
 	printf("[CLIENT] RECEIVED %s ON LKP\n", msg);
 	int removed_lkp = remove(LKP_NAME);
-	if (removed_lkp < 0) printf("ERROR: %s\n", strerror(removed_lkp));
+	if (removed_lkp < 0) printf("ERROR on removed_lkp: %s\n", strerror(removed_lkp));
 	
 	return 0;
 }
@@ -69,27 +70,28 @@ int server_handshake( int * from_client) {
 	//2. open the pipe, block until client connects
 	printf("[SERVER] OPENING WKP\n");
 	int opened_wkp = open(WKP_NAME, O_RDONLY);
-	if (opened_wkp < 0) printf("ERROR: %s\n", strerror(opened_wkp));
+	if (opened_wkp < 0) printf("ERROR on opened_wkp: %s\n", strerror(opened_wkp));
 
 	//6. recieve client message, removes WKP
 	char lkp_name[MESSAGE_BUFFER_SIZE];
 	int read_wkp = read(opened_wkp, lkp_name, MESSAGE_BUFFER_SIZE);
-	if (read_wkp < 0) printf("ERROR: %s\n", strerror(read_wkp));
+	if (read_wkp < 0) printf("ERROR on read_wkp: %s\n", strerror(read_wkp));
 	printf("[SERVER] RECEIVED lkp_name (private) ON WKP\n"); 
 	int removed_wkp = remove(WKP_NAME);
-	if (removed_wkp < 0) printf("ERROR: %s\n", strerror(removed_wkp));
+	if (removed_wkp < 0) printf("ERROR on removed_wkp: %s\n", strerror(removed_wkp));
 
 	//7a. connect to client FIFO
 	printf("[SERVER] connecting to LKP\n");
 	int opened_lkp = open(lkp_name, O_WRONLY);
-	if (opened_lkp < 0) printf("ERROR: %s\n", strerror(opened_lkp));
+	printf("opened_lkp: %d\n", opened_lkp);
+	if (opened_lkp < 0) printf("ERROR on opened_lkp: %s\n", strerror(opened_lkp));
 
 	//7b. send acknowledgement message on lkp
-	printf("[SERVER] sending acknowledgement");
+	printf("[SERVER] sending acknowledgement\n");
 	char msg[MESSAGE_BUFFER_SIZE];
 	strcpy(msg, "Hello");
 	int sent_msg = write(opened_lkp, msg, sizeof(msg));
-	if (sent_msg < 0) printf("ERROR: %s\n", strerror(sent_msg));
+	if (sent_msg < 0) printf("ERROR on sent_msg: %s\n", strerror(sent_msg));
 		
 	return 0;
 }
