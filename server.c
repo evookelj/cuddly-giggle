@@ -1,9 +1,13 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "pipe_networking.h"
 
 void process( char * s );
 
 int main() {
-
   int to_client, from_client;
   char buffer[MESSAGE_BUFFER_SIZE];
   

@@ -1,10 +1,15 @@
-GCC = gcc -c
+GCC = gcc
 
-compile: server.c client.c pipe_networking.c
-	$(GCC) pipe_networking.c
-	gcc client.c -o client
-	gcc server.c -o server
+compile: server client
+
+server: server.c pipe_networking.c
+	$(GCC) server.c pipe_networking.c -o server
+
+client: client.c pipe_networking.c
+	$(GCC) client.c pipe_networking.c -o client
 
 clean:
 	rm *.o
+	rm server
+	rm client
 
