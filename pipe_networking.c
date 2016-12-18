@@ -45,18 +45,18 @@ int client_handshake( int * to_server) {
 
 	//5. client waits for message from server
 	printf("[CLIENT] awaiting server message\n");
-	int opened_lkp = open(LKP_NAME, O_RDONLY);
-	if (opened_lkp < 0) printf("ERROR on opened_lkp: %s\n", strerror(opened_lkp));
+	* to_server = open(LKP_NAME, O_RDONLY);
+	if (*to_server < 0) printf("ERROR on *to_server: %s\n", strerror(*to_server));
 
 	//8. client gets server msg on lkp, removes lkp
 	char msg[MESSAGE_BUFFER_SIZE];
-	int read_lkp = read(opened_lkp, msg, MESSAGE_BUFFER_SIZE);
+	int read_lkp = read(*to_server, msg, MESSAGE_BUFFER_SIZE);
 	if (read_lkp < 0) printf("ERROR on read_lkp: %s\n", strerror(read_lkp));
 	printf("[CLIENT] RECEIVED %s ON LKP\n", msg);
 	int removed_lkp = remove(LKP_NAME);
 	if (removed_lkp < 0) printf("ERROR on removed_lkp: %s\n", strerror(removed_lkp));
 	
-	return 0;
+	return opened_wkp;
 }
 
 int server_handshake( int * from_client) {
@@ -69,12 +69,12 @@ int server_handshake( int * from_client) {
 	
 	//2. open the pipe, block until client connects
 	printf("[SERVER] OPENING WKP\n");
-	int opened_wkp = open(WKP_NAME, O_RDONLY);
-	if (opened_wkp < 0) printf("ERROR on opened_wkp: %s\n", strerror(opened_wkp));
+	* from_client = open(WKP_NAME, O_RDONLY);
+	if (*from_client < 0) printf("ERROR on *from_client: %s\n", strerror(* from_client));
 
 	//6. recieve client message, removes WKP
 	char lkp_name[MESSAGE_BUFFER_SIZE];
-	int read_wkp = read(opened_wkp, lkp_name, MESSAGE_BUFFER_SIZE);
+	int read_wkp = read(*from_client, lkp_name, MESSAGE_BUFFER_SIZE);
 	if (read_wkp < 0) printf("ERROR on read_wkp: %s\n", strerror(read_wkp));
 	printf("[SERVER] RECEIVED lkp_name (private) ON WKP\n"); 
 	int removed_wkp = remove(WKP_NAME);
@@ -93,5 +93,5 @@ int server_handshake( int * from_client) {
 	int sent_msg = write(opened_lkp, msg, sizeof(msg));
 	if (sent_msg < 0) printf("ERROR on sent_msg: %s\n", strerror(sent_msg));
 		
-	return 0;
+	return opened_lkp;
 }

@@ -16,7 +16,7 @@ int main() {
   read( from_client, buffer, sizeof(buffer) );
   process( buffer );
   write( to_client, buffer, sizeof(buffer));
-  
+	
   return 0;
 }
 

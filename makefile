@@ -13,3 +13,6 @@ clean:
 	rm server
 	rm client
 
+clean-q: server client
+	rm server
+	rm client
